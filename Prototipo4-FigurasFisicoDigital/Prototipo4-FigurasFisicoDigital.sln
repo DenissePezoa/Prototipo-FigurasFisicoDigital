@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prototipo4-FigurasFisicoDigital", "Prototipo4-FigurasFisicoDigital.csproj", "{1EE238DC-5D0D-4713-9022-8D2697284D4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1EE238DC-5D0D-4713-9022-8D2697284D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EE238DC-5D0D-4713-9022-8D2697284D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EE238DC-5D0D-4713-9022-8D2697284D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EE238DC-5D0D-4713-9022-8D2697284D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {82779475-83FF-46E2-BB5D-3ED8EB5E2862}
+	EndGlobalSection
+EndGlobal
