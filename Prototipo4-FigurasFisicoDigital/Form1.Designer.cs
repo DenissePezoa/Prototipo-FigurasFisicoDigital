@@ -37,9 +37,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.axAcroPDF1 = new AxAcroPDFLib.AxAcroPDF();
             this.label3 = new System.Windows.Forms.Label();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.axAcroPDF1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -64,7 +67,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(228, 363);
+            this.button1.Location = new System.Drawing.Point(433, 363);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(126, 48);
             this.button1.TabIndex = 2;
@@ -75,7 +78,7 @@
             // button2
             // 
             this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(380, 363);
+            this.button2.Location = new System.Drawing.Point(433, 417);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(126, 48);
             this.button2.TabIndex = 3;
@@ -107,7 +110,7 @@
             this.axAcroPDF1.Location = new System.Drawing.Point(592, 43);
             this.axAcroPDF1.Name = "axAcroPDF1";
             this.axAcroPDF1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axAcroPDF1.OcxState")));
-            this.axAcroPDF1.Size = new System.Drawing.Size(677, 520);
+            this.axAcroPDF1.Size = new System.Drawing.Size(665, 520);
             this.axAcroPDF1.TabIndex = 6;
             // 
             // label3
@@ -119,11 +122,32 @@
             this.label3.TabIndex = 7;
             this.label3.Text = "PDF Final con figuras agregadas";
             // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Location = new System.Drawing.Point(12, 333);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(323, 230);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox3.TabIndex = 8;
+            this.pictureBox3.TabStop = false;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(428, 495);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(130, 67);
+            this.button3.TabIndex = 9;
+            this.button3.Text = "Restaurar pdf";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1281, 575);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.axAcroPDF1);
             this.Controls.Add(this.label2);
@@ -137,6 +161,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.axAcroPDF1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -152,6 +177,8 @@
         private System.Windows.Forms.Label label2;
         private AxAcroPDFLib.AxAcroPDF axAcroPDF1;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.Button button3;
     }
 }
 
