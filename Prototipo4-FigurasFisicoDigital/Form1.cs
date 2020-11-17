@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.ComponentModel;
+using System.Data;
+
+using System.Linq;
+using System.Text;
+
 
 
 using Emgu.CV;
@@ -19,24 +21,24 @@ using Emgu.CV.Cuda;
 //using Emgu.CV.UI;
 using Emgu.CV.VideoStab;
 
-using iText.IO.Font;
-using iText.Kernel.Colors;
-using iText.Kernel.Font;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas;
-using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf.Canvas.Parser.Listener;
-using iText.Layout;
-using iText.Layout.Element;
+//using iText.IO.Font;
+//using iText.Kernel.Font;
+//using iText.Kernel.Colors;
+//using iText.Kernel.Pdf;
+//using iText.Kernel.Pdf.Canvas;
+//using iText.Kernel.Pdf.Canvas.Parser;
+//using iText.Kernel.Pdf.Canvas.Parser.Listener;
+//using iText.Layout;
+//using iText.Layout.Element;
 
-//using iTextSharp.text;
-//using iTextSharp.text.pdf;
-//using iTextSharp.text.pdf.parser;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
 using System.IO;
-using iText.Kernel.Geom;
+//using iText.Kernel.Geom;
 using System.Drawing.Imaging;
-using iText.IO.Image;
-using Image = iText.Layout.Element.Image;
+//using iText.IO.Image;
+//using Image = iText.Layout.Element.Image;
 using Org.BouncyCastle.Asn1.Esf;
 
 namespace Prototipo4_FigurasFisicoDigital
@@ -69,7 +71,10 @@ namespace Prototipo4_FigurasFisicoDigital
             if (_capture != null && _capture.Ptr != IntPtr.Zero)
             {
                 _capture.Retrieve(_frame, 0);
-                pictureBox1.Image = _frame.Bitmap;
+                Image<Bgr, byte> imagen_aux = _frame.ToImage<Bgr, byte>();
+                imagen_aux = imagen_aux.Rotate(180, new Bgr(0, 0, 0));
+                pictureBox1.Image = imagen_aux.Bitmap;
+                //pictureBox1.Image = _frame.Bitmap;
                 double fps = 15;
                 await Task.Delay(1000 / Convert.ToInt32(fps));
 
@@ -111,8 +116,11 @@ namespace Prototipo4_FigurasFisicoDigital
                 Mat aux2 = new Mat();
                 Mat aux3= new Mat();
                 Image<Bgr, byte> img = _frame.ToImage<Bgr, byte>();
-            //Transformar a espacio de color HSV
-            Image<Hsv, Byte> hsvimg = img.Convert<Hsv, Byte>();
+                
+                img = img.Rotate(180, new Bgr(0, 0, 0));
+                
+                //Transformar a espacio de color HSV
+                Image<Hsv, Byte> hsvimg = img.Convert<Hsv, Byte>();
 
             //extract the hue and value channels
             Image<Gray, Byte>[] channels = hsvimg.Split();  //separar en componentes
@@ -184,10 +192,12 @@ namespace Prototipo4_FigurasFisicoDigital
         {
             System.Drawing.Rectangle box = new System.Drawing.Rectangle();
             Image<Bgr, byte> temp = detectionFrame.ToImage<Bgr, byte>();
+            
+            temp = temp.Rotate(180, new Bgr(0, 0, 0));
             Image<Bgr, Byte> buffer_im = displayFrame.ToImage<Bgr, Byte>();
             float a = buffer_im.Width;
             float b = buffer_im.Height;
-            //MessageBox.Show("El tamano es   "+ a.ToString()+" y " +  b.ToString());
+            MessageBox.Show("El tamano camara es  W: "+ a.ToString()+" y H:" +  b.ToString());
             
             boxList.Clear();
             rect.Clear();
@@ -205,14 +215,16 @@ namespace Prototipo4_FigurasFisicoDigital
                 ///CvInvoke.Polylines(detectionFrame, contours, true, new MCvScalar(255, 0, 0), 2, LineType.FourConnected);
                 Image<Bgr, Byte> resultadoFinal = displayFrame.ToImage<Bgr, byte>();
 
+                resultadoFinal = resultadoFinal.Rotate(180, new Bgr(0, 0, 0));
+               
                 //Circulos
                 //double cannyThreshold = 180.0;
                 //double circleAccumulatorThreshold = 120;
                 //CircleF[] circles = CvInvoke.HoughCircles(detectionFrame, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
 
-               /// if (contours.Size > 0)
+                /// if (contours.Size > 0)
                 ///{
-                    double maxArea = 1000;
+                double maxArea = 1000;
                     int chosen = 0;
                     VectorOfPoint contour = null;
                     /*
@@ -271,8 +283,8 @@ namespace Prototipo4_FigurasFisicoDigital
                     }
                     */
                     //Dibuja borde rojo
-                   var temp2 = temp.SmoothGaussian(5).Convert<Gray, byte>().ThresholdBinary(new Gray(20), new Gray(255));
-
+                    var temp2 = temp.SmoothGaussian(5).Convert<Gray, byte>().ThresholdBinary(new Gray(20), new Gray(255));
+                    temp2 = temp2.Rotate(180, new Gray(0));
                     VectorOfVectorOfPoint contorno = new VectorOfVectorOfPoint();
                     Mat mat = new Mat();
                     CvInvoke.FindContours(temp2, contorno, mat, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
@@ -287,7 +299,7 @@ namespace Prototipo4_FigurasFisicoDigital
                         
                         VectorOfPointF approxF = new VectorOfPointF();
                         double area = CvInvoke.ContourArea(contorno[i]);
-                        if (area > 1000)
+                        if (area > 5000)
                         {
                             CvInvoke.ApproxPolyDP(contorno[i], approx, 0.04 * perimetro, true);
                         // CvInvoke.DrawContours(displayFrame, contorno, i, new MCvScalar(255, 0, 0), 2);
@@ -353,8 +365,8 @@ namespace Prototipo4_FigurasFisicoDigital
                                     RotatedRect rectangle = CvInvoke.MinAreaRect(contorno[i]);
                                     CvInvoke.DrawContours(resultadoFinal, contorno, i, new MCvScalar(255, 255, 255), 1, LineType.AntiAlias);
                                     resultadoFinal.Draw(rectangle, new Bgr(System.Drawing.Color.Cyan), 1);
-                                    CvInvoke.PutText(resultadoFinal, "Rectangle", new System.Drawing.Point(x, y),
-                                    Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
+                                    //CvInvoke.PutText(resultadoFinal, "Rectangle", new System.Drawing.Point(x, y),
+                                    //Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
                                     rect.Add(CvInvoke.BoundingRectangle(approx));
 
                                 }
@@ -370,8 +382,8 @@ namespace Prototipo4_FigurasFisicoDigital
                                     //resultadoFinal.Draw(poligono, new Bgr(Color.Cyan), 1);
                                     resultadoFinal.Draw(final_ellipseDibujo, new Bgr(System.Drawing.Color.Cyan), 1);
                                     CvInvoke.DrawContours(resultadoFinal, contorno, i, new MCvScalar(255, 255, 255), 1, LineType.AntiAlias);
-                                    CvInvoke.PutText(resultadoFinal, "Figura circular", new System.Drawing.Point(x, y),
-                                            Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
+                                    //CvInvoke.PutText(resultadoFinal, "Figura circular", new System.Drawing.Point(x, y),
+                                      //      Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
                                 }
                             }
                             //Es rectangulo
@@ -380,8 +392,8 @@ namespace Prototipo4_FigurasFisicoDigital
                                 RotatedRect rectangle = CvInvoke.MinAreaRect(contorno[i]);
                                 CvInvoke.DrawContours(resultadoFinal, contorno, i, new MCvScalar(255, 255, 255), 1, LineType.AntiAlias);
                                 resultadoFinal.Draw(rectangle, new Bgr(System.Drawing.Color.Cyan), 1);
-                                CvInvoke.PutText(resultadoFinal, "Rectangle", new System.Drawing.Point(x, y),
-                                Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
+                                //CvInvoke.PutText(resultadoFinal, "Rectangle", new System.Drawing.Point(x, y),
+                                //Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
                                 rect.Add(CvInvoke.BoundingRectangle(approx));
 
 
@@ -451,8 +463,8 @@ namespace Prototipo4_FigurasFisicoDigital
                                 //resultadoFinal.Draw(poligono, new Bgr(Color.Cyan), 1);
                                 resultadoFinal.Draw(final_ellipseDibujo, new Bgr(System.Drawing.Color.Cyan), 1);
                                 CvInvoke.DrawContours(resultadoFinal, contorno, i, new MCvScalar(255, 255, 255), 1, LineType.AntiAlias);
-                                CvInvoke.PutText(resultadoFinal, "Figura circular", new System.Drawing.Point(x, y),
-                                        Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
+                                //CvInvoke.PutText(resultadoFinal, "Figura circular", new System.Drawing.Point(x, y),
+                                  //      Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(0, 255, 255), 2);
                                
                                    
 
@@ -515,20 +527,20 @@ namespace Prototipo4_FigurasFisicoDigital
         {
             
             
-            string oldFile = "ejemploOK.pdf";
+            string oldFile = "opcion2X.pdf";
             string newFile = "temporal.pdf";
-
+            
            // string oldFile = textBox6.Text;
             //string newFile = "Code2.pdf";
 
-            PdfDocument pdfDoc = new PdfDocument(new PdfReader(oldFile), new PdfWriter(newFile));
+           /* PdfDocument pdfDoc = new PdfDocument(new PdfReader(oldFile), new PdfWriter(newFile));
             PdfCanvas canvas = new PdfCanvas(pdfDoc.GetFirstPage());
             iText.Kernel.Geom.Rectangle mediabox = pdfDoc.GetPage(1).GetMediaBox();
             double anchoPDF = mediabox.GetWidth();
-            double altoPDF = mediabox.GetHeight();
+            double altoPDF = mediabox.GetHeight();*/
             //MessageBox.Show("Medidas PDF ancho: "+ anchoPDF + " y alto: "+ altoPDF);
             //Sincronizar rectangulos
-            float incremento = 130;
+            //float incremento = 130;
             //Bitmap bmp = new Bitmap(1000, 1000, PixelFormat.Format32bppArgb);
            /* MemoryStream ms = new MemoryStream();
             bmp.Save(ms, ImageFormat.Png);
@@ -537,6 +549,9 @@ namespace Prototipo4_FigurasFisicoDigital
             
            
             canvas.AddImage(data,100,500,false);*/
+           
+
+            /*
             foreach (var item in rect)
             {
 
@@ -557,23 +572,14 @@ namespace Prototipo4_FigurasFisicoDigital
                     incremento = 100;
                 }
 
-               // MessageBox.Show("Info rectangulo real : " + item.X + ", puntoY : " + item.Y + " nuevoPtoY "+nuevoPtoY+ " , tamanoH : " + item.Height + ", tamanoW : " + item.Width);
-                //contentunder.SetColorStroke(BaseColor.BLACK);
-                //contentunder.Rectangle(item.X - 50, 680 - ((porcentaje * 680) / 100) + 40, item.Width * 1.1, item.Height);
-                //contentunder.Rectangle(puntoX, puntoY, tamanoW, tamanoH);
-                //contentunder.Stroke();
-                /*canvas.BeginText().SetFontAndSize(
-                    PdfFontFactory.CreateFont(FontConstants.HELVETICA), 12)
-                    .MoveText(265, 597)
-                    .ShowText("I agree to the terms and conditions.")
-                    .EndText();*/
+               
                     //El x estaba con -50
                 canvas.SetStrokeColor(new DeviceRgb(0, 0, 255))
                         .SetLineWidth(2)
                         .Rectangle(item.X-80, (841*0.9)-(nuevoPtoY*proporcion), item.Width*1.3, item.Height*proporcion)
                         .Stroke();
             }
-
+            */
             //Sincronizar triangulos
             /*foreach (var triangle in triangleList)
             {
@@ -612,7 +618,7 @@ namespace Prototipo4_FigurasFisicoDigital
 
 
             //Sincronizar elipses y circulos
-            foreach (var ellipse in ellipseList)
+           /* foreach (var ellipse in ellipseList)
             {
                 System.Drawing.Rectangle rr = ellipse.RotatedRect.MinAreaRect();
                 double porcentajeB = (rr.Bottom * 100 / 640);
@@ -631,30 +637,24 @@ namespace Prototipo4_FigurasFisicoDigital
 
 
                 pdfDoc.Close();
-            /*
-            PdfReader reader = new PdfReader(oldFile);
+            */
 
+
+
+            PdfReader reader = new PdfReader(oldFile);
+            var pageSize = reader.GetPageSize(1);
+            Console.WriteLine("Tamano de pagina PDF "+pageSize);
             PdfStamper stamper = new PdfStamper(reader, new FileStream(newFile, FileMode.Append));
             
             
             PdfContentByte contentunder = stamper.GetUnderContent(1);
+            
             //int rot;
             //rot = reader.GetPageRotation(1);
             //PdfDictionary pageDict;
             //pageDict = reader.GetPageN(1);
             //pageDict.Put(PdfName.ROTATE, new PdfNumber(rot + 90));
-            foreach (var item in boxList)
-            {
-                PointF[] puntos = item.GetVertices();
-                float puntoX = puntos[0].X;
-                float puntoY = puntos[0].Y;
-                float tamanoH = item.Size.Height;
-                float tamanoW = item.Size.Width;
-                
-                
-
-
-            }
+            
             
             float incremento = 130;
             foreach (var item in rect)
@@ -667,13 +667,16 @@ namespace Prototipo4_FigurasFisicoDigital
                 //float puntoY = puntos[0].Y;
                 //float tamanoH = item.Size.Height;
                 //float tamanoW = item.Size.Width;
-                float puntoY_nuevo = item.Y;
-                float porcentaje = (puntoY_nuevo * 100 / 640);
+               
+
+                float porcentaje = (item.Y * 100 / 640);
+                double nuevoPtoY = (porcentaje * (841)) / 100;
+                double proporcion = nuevoPtoY / item.Y;
                 if (porcentaje < 50)
                 {
                     incremento = 0;
                 }
-                else if (porcentaje > 50 && porcentaje<80)
+                else if (porcentaje > 50 && porcentaje < 80)
                 {
                     incremento = 70;
                 }
@@ -681,38 +684,109 @@ namespace Prototipo4_FigurasFisicoDigital
                 {
                     incremento = 100;
                 }
-                
+
                 MessageBox.Show("Info rectangulo real : " + item.X + ", puntoY : " + item.Y + ", tamanoH : " + item.Height + ", tamanoW : " + item.Width);
-                contentunder.SetColorStroke(BaseColor.BLACK);
-                contentunder.Rectangle(item.X-50, 680-((porcentaje*680)/100)+40, item.Width*1.1, item.Height);
+
+                contentunder.SetColorStroke(BaseColor.YELLOW);
+                ////Antigua coordenada contentunder.Rectangle(item.X - 50, (841 * 0.85) - (nuevoPtoY * proporcion)+incremento, item.Width * 1.3, item.Height * proporcion);
+                ////nueva coordenada
+                double propX = ((item.X * 100) / 640);
+                double ptoX2 = ((propX * 792) / 100);
+                double propY = ((item.Y * 100) / 480);
+                double ptoY2 = ((propY * 612) / 100);
+                double propArea = 1.58;
+                double propW = ((item.Width) * 100) / 640;
+                double ptoW2 = ((propW * 792) / 100);
+                double propH = ((item.Height * 100) / 480);
+                double ptoH2 = ((propH * 612) / 100);
+                contentunder.Rectangle(ptoX2+30, (612-ptoY2-(ptoH2-30)), ptoW2-30, ptoH2-30);
+
                 //contentunder.Rectangle(puntoX, puntoY, tamanoW, tamanoH);
                 contentunder.Stroke();
                 
             }
-            
-            
 
-            stamper.Close();
-            reader.Close();
-            */
-            File.Replace(@newFile, oldFile, @"backup.pdf.bac");
+            //Sincronizar circulos
+              foreach (var circle in circleList)
+              {
+                /*double x = circle.Center.X;
+                double y = circle.Center.Y;
+                double r = circle.Radius;
+                double porcentaje = (y * 100 / 640);
+                double nuevoPtoY = (porcentaje * (841*0.9)) / 100;
+                double proporcion = nuevoPtoY / y;
 
-            //File.Replace(@"temporal.pdf", @"ejemploOK.pdf", @"backup.pdf.bac");
-            MessageBox.Show("Pdf modificado con exito, se ha guardado un backup de la versión anterior ");
-            axAcroPDF1.src = "C:\\Users\\Denisse\\Desktop\\prototipos\\Prototipo4-FigurasFisicoDigital\\Prototipo4-FigurasFisicoDigital\\bin\\Debug\\ejemploOK.pdf";
+              // Setting color to the circle
+              contentunder.SetColorStroke(BaseColor.MAGENTA);
+              // creating a circle
+              contentunder.Circle(x, (841*0.9)-(nuevoPtoY), r*proporcion);*/
+                double propX = ((circle.Center.X * 100) / 640);
+                double ptoX2 = ((propX * 792) / 100);
+                double propY = ((circle.Center.Y * 100) / 480);
+                double ptoY2 = ((propY * 612) / 100);
+                double r = circle.Radius;
+                // Setting color to the circle
+                contentunder.SetColorStroke(BaseColor.MAGENTA);
+                // creating a circle
+                contentunder.Circle(ptoX2, 612-ptoY2-r, r * 1.58);
+                // Filling the circ
+                //canvas.Fill();
+                contentunder.Stroke();
+              }
 
-        }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
+                    //Sincronizar elipses y circulos
+             foreach (var ellipse in ellipseList)
+             {
+                 System.Drawing.Rectangle rr = ellipse.RotatedRect.MinAreaRect();
+                double propLeft = ((rr.Left * 100) / 640);
+                double ptoLeft2 = ((propLeft * 792) / 100);
 
-            string oldFile = "ejemploOK.pdf";
-            string backFile = "ejemploOK - copia.pdf";
+                double propRight = ((rr.Right * 100) / 640);
+                double ptoRight2 = ((propRight * 792) / 100);
 
-            File.Delete(oldFile);
-            File.Copy(backFile, oldFile, true);
-            MessageBox.Show("PDF restaurado");
+                double propBottom = ((rr.Bottom* 100) / 480);
+                double ptoBottom2 = ((propBottom * 612) / 100);
 
-        }
-    }
+                double propTop = ((rr.Top * 100) / 480);
+                double ptoTop2 = ((propTop * 612) / 100);
+
+                contentunder.SetColorStroke(BaseColor.GREEN);
+                contentunder.Ellipse(ptoLeft2, 612-ptoBottom2, ptoRight2, 612-ptoTop2);
+                /*double porcentajeB = (rr.Bottom * 100 / 640);
+                double nuevoPtoB = (porcentajeB * (841)) / 100;
+                double proporcionB = nuevoPtoB / rr.Bottom;
+
+                double porcentajeT = (rr.Top * 100 / 640);
+                double nuevoPtoT = (porcentajeT * (841)) / 100;
+                double proporcionT = nuevoPtoB / rr.Top;
+
+               contentunder.SetColorStroke(BaseColor.GREEN);
+               contentunder.Ellipse(rr.Left - 50, (841 * 0.9) - (nuevoPtoB), (rr.Right * 1.1) - 80, (841 * 0.9) - (nuevoPtoT));*/
+                contentunder.Stroke();
+             }
+
+ stamper.Close();
+ reader.Close();
+
+ File.Replace(@newFile, oldFile, @"backup.pdf.bac");
+
+ //File.Replace(@"temporal.pdf", @"ejemploOK.pdf", @"backup.pdf.bac");
+ MessageBox.Show("Pdf modificado con exito, se ha guardado un backup de la versión anterior ");
+ axAcroPDF1.src = "C:\\Users\\Denisse\\Desktop\\prototipos\\Prototipo4-FigurasFisicoDigital\\Prototipo4-FigurasFisicoDigital\\bin\\Debug\\opcion2X.pdf";
+
+}
+
+private void button3_Click(object sender, EventArgs e)
+{
+
+ string oldFile = "opcion2X.pdf";
+ string backFile = "opcion2X - copia.pdf";
+
+ File.Delete(oldFile);
+ File.Copy(backFile, oldFile, true);
+ MessageBox.Show("PDF restaurado");
+
+}
+}
 }
